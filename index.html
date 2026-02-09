@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scholar - Student Performance Analytics</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-header">
+            <h1 class="logo">Scholar</h1>
+            <p class="subtitle">Predictive Analytics for Student Performance</p>
+        </div>
+
+        <div class="card login-card">
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input
+                        type="email"
+                        id="email"
+                        placeholder="Enter your email"
+                        required
+                    />
+                </div>
+
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input
+                        type="password"
+                        id="password"
+                        placeholder="Enter your password"
+                        required
+                    />
+                </div>
+
+                <div id="errorAlert" class="alert alert-error hidden">
+                    <span id="errorMessage"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary btn-full">
+                    <span id="loginBtnText">Log In</span>
+                </button>
+            </form>
+
+            <div class="signup-footer">
+                <p class="signup-link">Don't have an account? <a href="signup.html">Sign Up</a></p>
+            </div>
+
+            <div class="demo-credentials">
+                <div class="demo-box">
+                    <p class="demo-title">Faculty Demo:</p>
+                    <p class="demo-text">Email: prof.johnson@university.edu</p>
+                    <p class="demo-text">Password: faculty123</p>
+                </div>
+                <div class="demo-box">
+                    <p class="demo-title">Student Demo:</p>
+                    <p class="demo-text">Email: alex.smith@university.edu</p>
+                    <p class="demo-text">Password: student123</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="mockData.js"></script>
+    <script src="app.js"></script>
+</body>
+</html>

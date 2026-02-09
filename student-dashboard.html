@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Dashboard - Scholar</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1 class="logo">Scholar</h1>
+                <p class="header-subtitle">Student Dashboard</p>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <p class="user-name" id="userName"></p>
+                    <p class="user-id" id="userStudentId"></p>
+                </div>
+                <button class="btn btn-outline btn-sm" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Risk Alert -->
+        <div id="riskAlert" class="alert alert-danger hidden">
+            <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span><strong>Your academic performance is below expectations.</strong> We recommend connecting with your academic advisor for support strategies.</span>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="metrics-grid">
+            <div class="card metric-card">
+                <div class="metric-content">
+                    <div>
+                        <p class="metric-label">Current GPA</p>
+                        <p class="metric-value" id="currentGPA">0.00</p>
+                    </div>
+                    <svg class="metric-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+                        <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="card metric-card">
+                <div class="metric-content">
+                    <div>
+                        <p class="metric-label">Target GPA</p>
+                        <p class="metric-value" id="targetGPA">0.00</p>
+                    </div>
+                    <svg class="metric-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                        <polyline points="17 6 23 6 23 12"></polyline>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="card metric-card">
+                <div class="metric-content">
+                    <div>
+                        <p class="metric-label">Attendance Rate</p>
+                        <p class="metric-value" id="attendanceRate">0%</p>
+                    </div>
+                    <svg class="metric-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <polyline points="12 6 12 12 16 14"></polyline>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="card metric-card">
+                <div class="metric-content">
+                    <div>
+                        <p class="metric-label">Assignments Done</p>
+                        <p class="metric-value" id="assignments">0/0</p>
+                    </div>
+                    <svg class="metric-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-grid">
+            <!-- Performance Trend -->
+            <div class="card chart-card chart-card-wide">
+                <h2 class="card-title">Performance Trend</h2>
+                <div class="chart-container">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+
+            <!-- GPA Progress -->
+            <div class="card chart-card">
+                <h2 class="card-title">GPA Progress</h2>
+                <div class="chart-container">
+                    <canvas id="gpaChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Exam Scores -->
+        <div class="card chart-card">
+            <h2 class="card-title">Recent Exam Scores</h2>
+            <div class="chart-container">
+                <canvas id="examChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Risk Factors & Strengths -->
+        <div class="info-grid">
+            <div class="card">
+                <div class="card-header-with-icon">
+                    <svg class="icon-danger" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                    <h2 class="card-title">Areas of Concern</h2>
+                </div>
+                <ul class="list" id="riskFactorsList"></ul>
+            </div>
+
+            <div class="card">
+                <div class="card-header-with-icon">
+                    <svg class="icon-success" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                        <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    <h2 class="card-title">Strengths</h2>
+                </div>
+                <ul class="list" id="strengthsList"></ul>
+            </div>
+        </div>
+
+        <!-- Recommendations -->
+        <div class="card recommendations-card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2 class="card-title" style="margin-bottom: 0;">Recommended Actions</h2>
+                <button class="btn btn-primary btn-sm btn-export" onclick="exportMyProgress()">
+                    <svg class="export-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Export Report
+                </button>
+            </div>
+            <ul class="recommendations-list">
+                <li class="recommendation-item">
+                    <span class="badge">1</span>
+                    <div>
+                        <p class="recommendation-title">Improve Attendance</p>
+                        <p class="recommendation-text">Attend at least 80% of classes to strengthen your engagement.</p>
+                    </div>
+                </li>
+                <li class="recommendation-item">
+                    <span class="badge">2</span>
+                    <div>
+                        <p class="recommendation-title">Complete All Assignments</p>
+                        <p class="recommendation-text">Only 55% completion rate. Focus on staying current with course work.</p>
+                    </div>
+                </li>
+                <li class="recommendation-item">
+                    <span class="badge">3</span>
+                    <div>
+                        <p class="recommendation-title">Connect with Support Services</p>
+                        <p class="recommendation-text">Schedule a meeting with your academic advisor this week.</p>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </main>
+
+    <script src="mockData.js"></script>
+    <script src="app.js"></script>
+    <script src="charts.js"></script>
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+</body>
+</html>

@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Faculty Dashboard - Scholar</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1 class="logo">Scholar</h1>
+                <p class="header-subtitle">Faculty Dashboard</p>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <p class="user-name" id="userName"></p>
+                    <p class="user-id" id="userDepartment"></p>
+                </div>
+                <button class="btn btn-outline btn-sm" onclick="logout()">Logout</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Critical Alert -->
+        <div id="criticalAlert" class="alert alert-danger hidden">
+            <svg class="alert-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="10"></circle>
+                <line x1="12" y1="8" x2="12" y2="12"></line>
+                <line x1="12" y1="16" x2="12.01" y2="16"></line>
+            </svg>
+            <span id="criticalAlertText"></span>
+        </div>
+
+        <!-- Key Metrics -->
+        <div class="metrics-grid">
+            <div class="card metric-card">
+                <div class="metric-content">
+                    <div>
+                        <p class="metric-label">Total Students</p>
+                        <p class="metric-value" id="totalStudents">0</p>
+                    </div>
+                    <svg class="metric-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="9" cy="7" r="4"></circle>
+                        <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                        <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="card metric-card">
+                <div class="metric-content">
+                    <div>
+                        <p class="metric-label">At-Risk Students</p>
+                        <p class="metric-value metric-danger" id="atRiskStudents">0</p>
+                    </div>
+                    <svg class="metric-icon icon-danger" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+                        <line x1="12" y1="9" x2="12" y2="13"></line>
+                        <line x1="12" y1="17" x2="12.01" y2="17"></line>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="card metric-card">
+                <div class="metric-content">
+                    <div>
+                        <p class="metric-label">Class Average GPA</p>
+                        <p class="metric-value" id="avgGPA">0.00</p>
+                    </div>
+                    <svg class="metric-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline>
+                        <polyline points="17 6 23 6 23 12"></polyline>
+                    </svg>
+                </div>
+            </div>
+
+            <div class="card metric-card">
+                <div class="metric-content">
+                    <div>
+                        <p class="metric-label">Withdrawal Rate</p>
+                        <p class="metric-value" id="withdrawalRate">0.0%</p>
+                    </div>
+                    <svg class="metric-icon" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="23 18 13.5 8.5 8.5 13.5 1 6"></polyline>
+                        <polyline points="17 18 23 18 23 12"></polyline>
+                    </svg>
+                </div>
+            </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="charts-grid">
+            <!-- Performance Trend -->
+            <div class="card chart-card chart-card-wide">
+                <h2 class="card-title">Performance Trend</h2>
+                <div class="chart-container">
+                    <canvas id="performanceTrendChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Risk Distribution -->
+            <div class="card chart-card">
+                <h2 class="card-title">Risk Distribution</h2>
+                <div class="chart-container">
+                    <canvas id="riskDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Attendance Analysis -->
+        <div class="card chart-card">
+            <h2 class="card-title">Attendance Analysis</h2>
+            <div class="chart-container">
+                <canvas id="attendanceChart"></canvas>
+            </div>
+        </div>
+
+        <!-- At-Risk Students Table -->
+        <div class="card">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem;">
+                <h2 class="card-title" style="margin-bottom: 0;">At-Risk Students</h2>
+                <button class="btn btn-primary btn-sm btn-export" onclick="exportStudentData()">
+                    <svg class="export-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    Export Data
+                </button>
+            </div>
+
+            <!-- Search and Filter -->
+            <div class="search-filter-bar">
+                <div class="search-box">
+                    <svg class="search-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Search by name or student ID...">
+                </div>
+                <select id="statusFilter" class="filter-select">
+                    <option value="all">All Students</option>
+                    <option value="at-risk">At-Risk Only</option>
+                    <option value="warning">Warning Only</option>
+                    <option value="healthy">Healthy Only</option>
+                </select>
+                <select id="sortBy" class="filter-select">
+                    <option value="risk-desc">Highest Risk First</option>
+                    <option value="risk-asc">Lowest Risk First</option>
+                    <option value="gpa-asc">Lowest GPA First</option>
+                    <option value="gpa-desc">Highest GPA First</option>
+                </select>
+            </div>
+
+            <div class="table-container">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>GPA</th>
+                            <th>Attendance</th>
+                            <th>Withdrawal Risk</th>
+                            <th>Status</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody id="atRiskTable"></tbody>
+                </table>
+            </div>
+        </div>
+    </main>
+
+    <!-- Student Detail Modal -->
+    <div id="studentModal" class="modal-overlay hidden" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3 class="modal-title" id="modalStudentName">Student Details</h3>
+                <button class="modal-close" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="info-section">
+                    <div class="info-section-title">Student Information</div>
+                    <div class="info-grid-2">
+                        <div class="info-item">
+                            <span class="info-label">Student ID</span>
+                            <span class="info-value" id="modalStudentId"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Status</span>
+                            <span class="info-value" id="modalStatus"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Last Active</span>
+                            <span class="info-value" id="modalLastActive"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Engagement Score</span>
+                            <span class="info-value" id="modalEngagement"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-section-title">Academic Performance</div>
+                    <div class="info-grid-2">
+                        <div class="info-item">
+                            <span class="info-label">Current GPA</span>
+                            <span class="info-value" id="modalGPA"></span>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Attendance Rate</span>
+                            <span class="info-value" id="modalAttendance"></span>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="modalAttendanceBar"></div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Assignment Completion</span>
+                            <span class="info-value" id="modalAssignments"></span>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar" id="modalAssignmentsBar"></div>
+                            </div>
+                        </div>
+                        <div class="info-item">
+                            <span class="info-label">Withdrawal Risk</span>
+                            <span class="info-value danger" id="modalWithdrawalRisk"></span>
+                            <div class="progress-bar-container">
+                                <div class="progress-bar danger" id="modalWithdrawalBar"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="info-section">
+                    <div class="info-section-title">Risk Analysis</div>
+                    <div class="info-item">
+                        <span class="info-label">Failure Risk</span>
+                        <span class="info-value warning" id="modalFailureRisk"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-outline btn-sm" onclick="closeModal()">Close</button>
+                <button class="btn btn-primary btn-sm" onclick="sendNotificationToStudent()">Send Notification</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Container -->
+    <div id="toastContainer" class="toast-container"></div>
+
+    <script src="mockData.js"></script>
+    <script src="app.js"></script>
+    <script src="charts.js"></script>
+</body>
+</html>

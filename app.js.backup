@@ -1,0 +1,167 @@
+// ===== Authentication Functions =====
+function validateCredentials(email, password) {
+    if (email === MOCK_USERS.faculty.email && password === 'faculty123') {
+        return MOCK_USERS.faculty;
+    }
+    if (email === MOCK_USERS.student.email && password === 'student123') {
+        return MOCK_USERS.student;
+    }
+    return null;
+}
+
+function logout() {
+    localStorage.removeItem('scholar_user');
+    window.location.href = 'index.html';
+}
+
+function checkAuth() {
+    const userStr = localStorage.getItem('scholar_user');
+    if (!userStr) {
+        if (!window.location.pathname.endsWith('index.html') &&
+            window.location.pathname !== '/' &&
+            !window.location.pathname.endsWith('/')) {
+            window.location.href = 'index.html';
+        }
+        return null;
+    }
+    return JSON.parse(userStr);
+}
+
+// ===== Login Page Logic =====
+if (window.location.pathname.endsWith('index.html') ||
+    window.location.pathname === '/' ||
+    window.location.pathname.endsWith('/')) {
+
+    const user = checkAuth();
+    if (user) {
+        // Redirect if already logged in
+        if (user.role === 'faculty') {
+            window.location.href = 'faculty-dashboard.html';
+        } else {
+            window.location.href = 'student-dashboard.html';
+        }
+    }
+
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const errorAlert = document.getElementById('errorAlert');
+            const errorMessage = document.getElementById('errorMessage');
+            const loginBtnText = document.getElementById('loginBtnText');
+
+            loginBtnText.textContent = 'Logging in...';
+            errorAlert.classList.add('hidden');
+
+            setTimeout(() => {
+                const user = validateCredentials(email, password);
+
+                if (!user) {
+                    errorMessage.textContent = 'Invalid email or password';
+                    errorAlert.classList.remove('hidden');
+                    loginBtnText.textContent = 'Log In';
+                    return;
+                }
+
+                localStorage.setItem('scholar_user', JSON.stringify(user));
+
+                if (user.role === 'faculty') {
+                    window.location.href = 'faculty-dashboard.html';
+                } else {
+                    window.location.href = 'student-dashboard.html';
+                }
+            }, 500);
+        });
+    }
+}
+
+// ===== Student Dashboard Logic =====
+if (window.location.pathname.endsWith('student-dashboard.html')) {
+    const user = checkAuth();
+
+    if (!user || user.role !== 'student') {
+        window.location.href = 'index.html';
+    } else {
+        // Populate user info
+        document.getElementById('userName').textContent = user.name;
+        document.getElementById('userStudentId').textContent = user.studentId;
+
+        // Populate metrics
+        document.getElementById('currentGPA').textContent = MOCK_STUDENT_PROFILE.currentGPA.toFixed(2);
+        document.getElementById('targetGPA').textContent = MOCK_STUDENT_PROFILE.targetGPA.toFixed(2);
+        document.getElementById('attendanceRate').textContent = MOCK_STUDENT_PROFILE.attendanceRate + '%';
+        document.getElementById('assignments').textContent =
+            `${MOCK_STUDENT_PROFILE.assignmentsCompleted}/${MOCK_STUDENT_PROFILE.totalAssignments}`;
+
+        // Show risk alert if at risk
+        if (MOCK_STUDENT_PROFILE.currentGPA < 2.5) {
+            document.getElementById('riskAlert').classList.remove('hidden');
+        }
+
+        // Populate risk factors
+        const riskFactorsList = document.getElementById('riskFactorsList');
+        MOCK_STUDENT_PROFILE.riskFactors.forEach(factor => {
+            const li = document.createElement('li');
+            li.textContent = factor;
+            riskFactorsList.appendChild(li);
+        });
+
+        // Populate strengths
+        const strengthsList = document.getElementById('strengthsList');
+        MOCK_STUDENT_PROFILE.strengths.forEach(strength => {
+            const li = document.createElement('li');
+            li.textContent = strength;
+            strengthsList.appendChild(li);
+        });
+    }
+}
+
+// ===== Faculty Dashboard Logic =====
+if (window.location.pathname.endsWith('faculty-dashboard.html')) {
+    const user = checkAuth();
+
+    if (!user || user.role !== 'faculty') {
+        window.location.href = 'index.html';
+    } else {
+        // Populate user info
+        document.getElementById('userName').textContent = user.name;
+        document.getElementById('userDepartment').textContent = user.department;
+
+        // Populate metrics
+        document.getElementById('totalStudents').textContent = CLASS_STATISTICS.totalStudents;
+        document.getElementById('atRiskStudents').textContent = CLASS_STATISTICS.atRiskCount;
+        document.getElementById('avgGPA').textContent = CLASS_STATISTICS.avgGPA.toFixed(2);
+        document.getElementById('withdrawalRate').textContent = CLASS_STATISTICS.withdrawalRate.toFixed(1) + '%';
+
+        // Show critical alert if there are at-risk students
+        const atRiskStudents = MOCK_STUDENTS.filter(s => s.status === 'at-risk');
+        if (atRiskStudents.length > 0) {
+            const criticalAlert = document.getElementById('criticalAlert');
+            const criticalAlertText = document.getElementById('criticalAlertText');
+            criticalAlertText.innerHTML = `<strong>${atRiskStudents.length} students</strong> are at high risk of withdrawal. Immediate intervention recommended.`;
+            criticalAlert.classList.remove('hidden');
+        }
+
+        // Populate at-risk students table
+        const atRiskTable = document.getElementById('atRiskTable');
+        atRiskStudents.forEach(student => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${student.name}</td>
+                <td>${student.gpa.toFixed(2)}</td>
+                <td>${student.attendanceRate}%</td>
+                <td><span class="table-badge">${student.withdrawalRisk}%</span></td>
+                <td><button class="btn btn-outline btn-sm" onclick="viewStudent('${student.id}')">View Details</button></td>
+            `;
+            atRiskTable.appendChild(tr);
+        });
+    }
+}
+
+// View student details (placeholder function)
+function viewStudent(studentId) {
+    alert(`View details for student: ${studentId}\n(This would open a detailed view in a full implementation)`);
+}
